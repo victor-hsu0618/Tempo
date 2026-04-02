@@ -28,8 +28,11 @@ export function Visualizer({
       const staffEngine = new StaffNotationEngine(canvasRef.current);
       staffEngine.setCanvasSize(800, 300);
       staffEngineRef.current = staffEngine;
+      
+      // 初始化 LED 和五線譜
+      updateLEDs(0, timeSignature.numerator);
     }
-  }, []);
+  }, [timeSignature.numerator]);
 
   // 動畫循環
   useEffect(() => {
@@ -44,7 +47,7 @@ export function Visualizer({
       // 繪製五線譜
       staffEngineRef.current.drawStaff(state.timeSignature);
 
-      // 繪製播放進度指標
+      // 繪製播放進度指標（使用 0-based beatIndex）
       staffEngineRef.current.drawPlayhead(state.currentBeat);
 
       // 繪製轉換警告（如果有）
@@ -64,7 +67,7 @@ export function Visualizer({
         }
       }
 
-      // 更新 LED 指示器
+      // 更新 LED 指示器（使用 0-based beatIndex）
       updateLEDs(state.currentBeat, timeSignature.numerator);
 
       animationIdRef.current = requestAnimationFrame(animate);
@@ -85,8 +88,12 @@ export function Visualizer({
     if (!ledContainerRef.current) return;
 
     const leds = ledContainerRef.current.querySelectorAll('.led');
+    // beatIndex 是 0-based，但需要與 1-based 的拍號對齐
+    // 第 1 拍 (beatIndex=0) 应该点亮 idx=0 的 LED
+    const currentBeatInMeasure = beatIndex % numerator;
+    
     leds.forEach((led, idx) => {
-      if (idx === beatIndex % numerator) {
+      if (idx === currentBeatInMeasure) {
         led.classList.add('active');
       } else {
         led.classList.remove('active');
