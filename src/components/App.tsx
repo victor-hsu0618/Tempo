@@ -112,6 +112,12 @@ export function App() {
   };
 
   const handleTransitionAdd = (transition: TimeSignatureTransition) => {
+    // 驗證：如果添加轉換，當前時間簽名應匹配轉換的 'from'
+    if (transition.from.numerator !== timeSignature.numerator || 
+        transition.from.denominator !== timeSignature.denominator) {
+      // 自動切換到轉換的源時間簽名
+      setTimeSignature(transition.from);
+    }
     setTransitions([...transitions, transition]);
   };
 

@@ -26,6 +26,8 @@ export function Metronome({
   onPlayToggle
 }: MetronomeProps) {
   const [showTransitionForm, setShowTransitionForm] = useState(false);
+  const [transitionFromIdx, setTransitionFromIdx] = useState(0);
+  const [transitionToIdx, setTransitionToIdx] = useState(1);
   const [transitionBeat, setTransitionBeat] = useState('2');
 
   const timeSignatures: TimeSignature[] = [
@@ -36,17 +38,18 @@ export function Metronome({
   ];
 
   const handleAddTransition = () => {
-    if (!transitionBeat) return;
+    if (!transitionBeat || transitionFromIdx === transitionToIdx) return;
 
     const newTransition: TimeSignatureTransition = {
-      from: timeSignature,
-      to: timeSignatures[(timeSignatures.indexOf(timeSignature) + 1) % timeSignatures.length],
+      from: timeSignatures[transitionFromIdx],
+      to: timeSignatures[transitionToIdx],
       measureAtTransition: parseInt(transitionBeat, 10),
       warningMeasure: 1
     };
 
     onTransitionAdd(newTransition);
     setTransitionBeat('');
+    setShowTransitionForm(false);
   };
 
   return (
@@ -110,17 +113,58 @@ export function Metronome({
 
         {showTransitionForm && (
           <div className="transition-form">
-            <label htmlFor="transition-beat">第幾個小節轉換：</label>
-            <input
-              id="transition-beat"
-              type="number"
-              min="1"
-              value={transitionBeat}
-              onChange={(e) => setTransitionBeat(e.target.value)}
-              placeholder="例：2"
-            />
+            <div className="transition-form-group">
+              <label htmlFor="transition-from">從：</label>
+              <select
+                id="transition-from"
+                value={transitionFromIdx}
+                onChange={(e) => setTransitionFromIdx(parseInt(e.target.value, 10))}
+              >
+                {timeSignatures.map((ts, idx) => (
+                  <option key={idx} value={idx}>
+                    {ts.numerator}/{ts.denominator}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="transition-form-group">
+              <label htmlFor="transition-to">轉到：</label>
+              <select
+                id="transition-to"
+                value={transitionToIdx}
+                onChange={(e) => setTransitionToIdx(parseInt(e.target.value, 10))}
+              >
+                {timeSignatures.map((ts, idx) => (
+                  <option key={idx} value={idx}>
+                    {ts.numerator}/{ts.denominator}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="transition-form-group">
+              <label htmlFor="transition-beat">第幾個小節轉換：</label>
+              <input
+                id="transition-beat"
+                type="number"
+                min="1"
+                max="32"
+                value={transitionBeat}
+                onChange={(e) => setTransitionBeat(e.target.value)}
+                placeholder="例：2"
+              />
+            </div>
+
             <button onClick={handleAddTransition} className="btn-primary btn-small">
-              確認轉換
+              確認 {timeSignatures[transitionFromIdx].numerator}/{timeSignatures[transitionFromIdx].denominator} 
+              → {timeSignatures[transitionToIdx].numerator}/{timeSignatures[transitionToIdx].denominator}
+            </button>
+            <button
+              onClick={() => setShowTransitionForm(false)}
+              className="btn-secondary btn-small"
+            >
+              取消
             </button>
           </div>
         )}
