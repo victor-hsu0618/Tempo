@@ -26,7 +26,7 @@ export function Visualizer({
   useEffect(() => {
     if (canvasRef.current) {
       const staffEngine = new StaffNotationEngine(canvasRef.current);
-      staffEngine.setCanvasSize(800, 300);
+      staffEngine.setCanvasSize(600, 200);
       staffEngineRef.current = staffEngine;
       
       // 初始化 LED 和五線譜
