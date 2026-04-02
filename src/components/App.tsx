@@ -4,7 +4,7 @@ import { AdvancedScoringManager } from '../services/advancedScoringManager';
 import { InputManager } from '../services/inputManager';
 import { FeedbackSystem } from '../services/feedbackSystem';
 import { StorageService } from '../services/storageService';
-import type { TimeSignature, TimeSignatureTransition } from '../types';
+import type { TimeSignature, TimeSignatureTransition, Note } from '../types';
 import { Metronome } from './Metronome';
 import { Visualizer } from './Visualizer';
 import { ScoreDisplay } from './ScoreDisplay';
@@ -21,6 +21,12 @@ export function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [transitions, setTransitions] = useState<TimeSignatureTransition[]>([]);
   const [score, setScore] = useState(0);
+  const [notes, setNotes] = useState<Note[]>([
+    { pitch: 'A4', duration: 1 },
+    { pitch: 'A4', duration: 1 },
+    { pitch: 'A4', duration: 1 },
+    { pitch: 'A4', duration: 1 }
+  ]);
 
   // 初始化所有系統
   useEffect(() => {
@@ -50,6 +56,15 @@ export function App() {
       audioEngine.initialize(bpm, timeSignature, transitions);
     }
   }, [bpm, timeSignature, transitions, audioEngine, isPlaying]);
+
+  // 生成默認音符
+  useEffect(() => {
+    const defaultNotes: Note[] = Array.from({ length: timeSignature.numerator }).map(() => ({
+      pitch: 'A4',
+      duration: 1
+    }));
+    setNotes(defaultNotes);
+  }, [timeSignature]);
 
   const handlePlayToggle = () => {
     if (!audioEngine || !scoringManager || !inputManager) return;
@@ -181,6 +196,7 @@ export function App() {
                 isPlaying={isPlaying}
                 timeSignature={timeSignature}
                 transitions={transitions}
+                notes={notes}
               />
             )}
           </section>

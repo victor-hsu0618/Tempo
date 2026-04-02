@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { TimeSignature, TimeSignatureTransition } from '../types';
+import type { TimeSignature, TimeSignatureTransition, Note } from '../types';
 import { AudioEngine } from '../services/audioEngine';
 import { StaffNotationEngine } from '../services/staffNotation';
 import '../styles/Visualizer.css';
@@ -9,13 +9,15 @@ interface VisualizerProps {
   isPlaying: boolean;
   timeSignature: TimeSignature;
   transitions: TimeSignatureTransition[];
+  notes: Note[];
 }
 
 export function Visualizer({
   audioEngine,
   isPlaying,
   timeSignature,
-  transitions
+  transitions,
+  notes
 }: VisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ledContainerRef = useRef<HTMLDivElement>(null);
@@ -46,6 +48,9 @@ export function Visualizer({
 
       // 繪製五線譜
       staffEngineRef.current.drawStaff(state.timeSignature);
+
+      // 繪製音符
+      staffEngineRef.current.drawNotes(notes, state.timeSignature);
 
       // 繪製播放進度指標（使用 0-based beatIndex）
       staffEngineRef.current.drawPlayhead(state.currentBeat);
@@ -82,7 +87,7 @@ export function Visualizer({
         cancelAnimationFrame(animationIdRef.current);
       }
     };
-  }, [isPlaying, audioEngine, timeSignature, transitions]);
+  }, [isPlaying, audioEngine, timeSignature, transitions, notes]);
 
   const updateLEDs = (beatIndex: number, numerator: number) => {
     if (!ledContainerRef.current) return;
