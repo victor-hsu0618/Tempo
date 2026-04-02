@@ -52,7 +52,8 @@ export function Metronome({
     };
 
     onTransitionAdd(newTransition);
-    setTransitionBeat('');
+    setTransitionBeat('2');
+    setShowTransitionForm(false);
     setShowTransitionForm(false);
   };
 
@@ -162,11 +163,22 @@ export function Metronome({
                 <div className="measure-input-wrapper">
                   <input
                     id="transition-beat"
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     min="1"
                     max="32"
                     value={transitionBeat}
-                    onChange={(e) => setTransitionBeat(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === '' || /^\d+$/.test(value)) {
+                        setTransitionBeat(value);
+                      }
+                    }}
+                    onBlur={(e) => {
+                      if (!e.target.value) {
+                        setTransitionBeat('2');
+                      }
+                    }}
                     placeholder="2"
                     className="measure-input"
                   />
