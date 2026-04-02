@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <defs>
+    <style>
+      .icon-bg { fill: #6B4FBB; }
+      .icon-text { font-size: 100px; font-weight: bold; fill: white; font-family: Arial, sans-serif; text-anchor: middle; }
+    </style>
+  </defs>
+  <rect width="192" height="192" class="icon-bg"/>
+  <text x="96" y="130" class="icon-text">T</text>
+</svg>
