@@ -8,6 +8,7 @@ import type { TimeSignature, TimeSignatureTransition } from '../types';
 import { Metronome } from './Metronome';
 import { Visualizer } from './Visualizer';
 import { ScoreDisplay } from './ScoreDisplay';
+// import { NoteEditor } from './NoteEditor'; // TODO: 集成音符編輯器
 import '../styles/App.css';
 
 export function App() {

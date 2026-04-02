@@ -1,5 +1,17 @@
 import type { Note, TimeSignature } from '../types';
 
+// 音符高度映射（從下到上）
+const PITCH_TO_LINE = {
+  'C4': 8, 'D4': 7, 'E4': 6, 'F4': 5, 'G4': 4, 'A4': 3, 'B4': 2,
+  'C5': 1, 'D5': 0, 'E5': -1, 'F5': -2, 'G5': -3, 'A5': -4, 'B5': -5,
+  'C3': 10, 'D3': 9, 'E3': 8, 'F3': 7, 'G3': 6, 'A3': 5, 'B3': 4
+};
+
+const LINE_TO_PITCH = Object.entries(PITCH_TO_LINE).reduce(
+  (acc, [pitch, line]) => ({ ...acc, [line]: pitch }),
+  {} as Record<number, string>
+);
+
 export class StaffNotationEngine {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -7,12 +19,71 @@ export class StaffNotationEngine {
   private staffStartX = 50;
   private staffStartY = 50;
   private noteRadius = 6;
+  private beatWidth = 60;
+  private selectedNoteIndex: number | null = null;
+  private editMode = false;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('Could not get canvas context');
     this.ctx = ctx;
+  }
+
+  /**
+   * 設定編輯模式
+   */
+  setEditMode(enabled: boolean) {
+    this.editMode = enabled;
+  }
+
+  /**
+   * 取得選中的音符索引
+   */
+  getSelectedNoteIndex(): number | null {
+    return this.selectedNoteIndex;
+  }
+
+  /**
+   * 調整選中音符的音高
+   */
+  adjustNoteByDirection(notes: Note[], direction: 'up' | 'down'): Note[] {
+    if (this.selectedNoteIndex === null || this.selectedNoteIndex >= notes.length) {
+      return notes;
+    }
+
+    const note = notes[this.selectedNoteIndex];
+    const currentLine = PITCH_TO_LINE[note.pitch as keyof typeof PITCH_TO_LINE] ?? 4;
+    const newLine = direction === 'up' ? currentLine - 1 : currentLine + 1;
+    const newPitch = LINE_TO_PITCH[newLine];
+
+    if (newPitch) {
+      const updatedNotes = [...notes];
+      updatedNotes[this.selectedNoteIndex] = { ...note, pitch: newPitch };
+      return updatedNotes;
+    }
+
+    return notes;
+  }
+
+  /**
+   * 從滑鼠位置選擇音符
+   */
+  selectNoteFromMouse(x: number, y: number, notes: Note[]): number | null {
+    let beatPosition = 0;
+    for (let i = 0; i < notes.length; i++) {
+      const noteX = this.staffStartX + beatPosition * this.beatWidth + (this.beatWidth * 0.5);
+      const noteLine = PITCH_TO_LINE[notes[i].pitch as keyof typeof PITCH_TO_LINE] ?? 4;
+      const noteY = this.staffStartY + (4 - noteLine) * this.staffLineSpacing;
+
+      const distance = Math.sqrt((x - noteX) ** 2 + (y - noteY) ** 2);
+      if (distance < this.noteRadius + 10) {
+        return i;
+      }
+
+      beatPosition += notes[i].duration;
+    }
+    return null;
   }
 
   /**
@@ -59,21 +130,29 @@ export class StaffNotationEngine {
    */
   drawNotes(notes: Note[], _timeSignature?: TimeSignature, _scrollProgress: number = 0) {
     const ctx = this.ctx;
-    const beatWidth = 60; // 像素
     let beatPosition = 0;
 
-    notes.forEach((note) => {
-      const x = this.staffStartX + beatPosition * beatWidth + (beatWidth * 0.5);
-      const y = this.staffStartY + 60; // 中線位置
+    notes.forEach((note, index) => {
+      const x = this.staffStartX + beatPosition * this.beatWidth + (this.beatWidth * 0.5);
+      
+      // 根據音高計算 y 位置
+      const pitchLine = PITCH_TO_LINE[note.pitch as keyof typeof PITCH_TO_LINE] ?? 4;
+      const y = this.staffStartY + (4 - pitchLine) * this.staffLineSpacing;
+
+      // 高亮選中的音符
+      if (this.editMode && this.selectedNoteIndex === index) {
+        ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
+        ctx.fillRect(x - this.beatWidth * 0.35, y - 25, this.beatWidth * 0.7, 50);
+      }
 
       // 繪製音符頭
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = this.editMode && this.selectedNoteIndex === index ? '#6366f1' : '#000000';
       ctx.beginPath();
       ctx.arc(x, y, this.noteRadius, 0, Math.PI * 2);
       ctx.fill();
 
       // 繪製音符莖
-      ctx.strokeStyle = '#000000';
+      ctx.strokeStyle = this.editMode && this.selectedNoteIndex === index ? '#6366f1' : '#000000';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(x + this.noteRadius, y);
@@ -86,6 +165,17 @@ export class StaffNotationEngine {
         ctx.beginPath();
         ctx.arc(x + 20, y, 3, 0, Math.PI * 2);
         ctx.fill();
+      }
+
+      // 編輯模式：顯示音高標籤和上下調整提示
+      if (this.editMode && this.selectedNoteIndex === index) {
+        ctx.fillStyle = '#6366f1';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(note.pitch, x, y - 50);
+        ctx.font = '10px Arial';
+        ctx.fillStyle = '#999999';
+        ctx.fillText('↑/↓ 調整音高', x, y + 50);
       }
 
       beatPosition += note.duration;
