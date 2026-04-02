@@ -1,0 +1,184 @@
+/* 視覺化面板 */
+.visualizer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* LED 容器 */
+.led-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #000;
+  border-radius: 8px;
+  min-height: 100px;
+  align-items: center;
+}
+
+.led {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #333;
+  border: 2px solid #555;
+  transition: all 0.1s ease;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  cursor: default;
+}
+
+.led.downbeat {
+  border-color: var(--warning-color);
+}
+
+.led.active {
+  background: radial-gradient(circle at 30% 30%, #ff6b6b, #ff0000);
+  box-shadow: 0 0 10px rgba(255, 107, 107, 0.8),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  animation: ledFlash 0.3s ease-out;
+}
+
+.led.downbeat.active {
+  background: radial-gradient(circle at 30% 30%, #ffd700, #ffa500);
+  box-shadow: 0 0 15px rgba(255, 165, 0, 0.9),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes ledFlash {
+  0% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 五線譜容器 */
+.staff-container {
+  background-color: #fafafa;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  overflow-x: auto;
+}
+
+.staff-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  background-color: white;
+  border-radius: 4px;
+}
+
+/* 進度信息 */
+.progress-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  background-color: var(--bg-light);
+  border-radius: 8px;
+}
+
+.progress-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.progress-item .label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.progress-item .value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+/* 進度條 */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--primary-color) 0%,
+    var(--primary-dark) 100%
+  );
+  transition: width 0.1s linear;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
+
+/* 轉換警告動畫 */
+@keyframes transitionWarning {
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}
+
+/* 響應式 */
+@media (max-width: 768px) {
+  .led-container {
+    gap: 0.5rem;
+    padding: 0.75rem;
+    min-height: 80px;
+  }
+
+  .led {
+    width: 40px;
+    height: 40px;
+  }
+
+  .progress-info {
+    grid-template-columns: 1fr;
+  }
+
+  .progress-item .value {
+    font-size: 1.25rem;
+  }
+}
+
+/* 觸屏優化 */
+@media (hover: none) and (pointer: coarse) {
+  button {
+    min-height: 48px;
+    min-width: 48px;
+    padding: 0.75rem 1.5rem;
+  }
+
+  .led {
+    cursor: pointer;
+  }
+  
+  .led:active {
+    transform: scale(0.95);
+  }
+}
+
+/* 性能優化 */
+canvas {
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}

@@ -1,0 +1,223 @@
+/* 計分面板 */
+.score-display {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* 主分數顯示 */
+.score-main {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.score-main::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: moveBackground 20s linear infinite;
+}
+
+@keyframes moveBackground {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(20px, 20px);
+  }
+}
+
+.score-main > * {
+  position: relative;
+  z-index: 1;
+}
+
+.score-value {
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.score-max {
+  font-size: 1.2rem;
+  opacity: 0.8;
+  margin-top: 0.5rem;
+}
+
+.score-grade {
+  font-size: 1.5rem;
+  margin-top: 1rem;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 統計卡片 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.stat-card {
+  background-color: var(--bg-light);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+/* 進度部分 */
+.progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.progress-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 10px;
+  background-color: var(--border-color);
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--success-color), #34d399);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+/* 互動按鈕 */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.btn-hit {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--success-color), #059669);
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-hit:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-hit:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-hit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* 反饋信息 */
+.feedback {
+  background-color: #fef3c7;
+  border-left: 4px solid var(--warning-color);
+  padding: 1rem;
+  border-radius: 8px;
+  animation: slideIn 0.3s ease;
+}
+
+.feedback-text {
+  color: #92400e;
+  font-weight: 600;
+  margin: 0;
+  text-align: center;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 響應式 */
+@media (max-width: 768px) {
+  .score-main {
+    padding: 1.5rem;
+  }
+
+  .score-value {
+    font-size: 2.5rem;
+  }
+
+  .score-grade {
+    font-size: 1.25rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-hit {
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+}
